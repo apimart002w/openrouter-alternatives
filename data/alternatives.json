@@ -1,0 +1,86 @@
+{
+  "schema": "openrouter-alternatives-v1",
+  "updated": "2026-09-17",
+  "note": "Rows describe route ARCHETYPES and the questions to verify, not vendor scorecards. Named products are examples of an archetype; confirm every cell against the provider's own documentation for your account before migrating.",
+  "dimensions": [
+    {"id": "coverage", "label": "Model coverage", "verify": "Which model ids do you actually call, and are all of them present? Display names are not model ids."},
+    {"id": "unit", "label": "Pricing unit", "verify": "Per token, per image, per second, or per call — and is the price per request or per delivered artefact?"},
+    {"id": "compat", "label": "OpenAI compatibility", "verify": "Same path and body for chat, streaming, tools, structured output, vision and images? Which surfaces need an adapter?"},
+    {"id": "byok", "label": "Bring your own keys", "verify": "Can you attach provider keys, or does the platform own the provider relationship?"},
+    {"id": "free", "label": "Free tier / credits", "verify": "Are free requests rate-limited or model-limited, and what happens when credits run out?"},
+    {"id": "limits", "label": "Rate limits & quotas", "verify": "Requests per minute, tokens per minute, concurrency, and the error shape when you exceed them."},
+    {"id": "async", "label": "Async & job model", "verify": "Do generation routes return a task id with a poll URL, and do result URLs expire?"},
+    {"id": "retention", "label": "Retention & regions", "verify": "Log retention, training use, residency and any data processing agreement you need."},
+    {"id": "migration", "label": "Migration effort", "verify": "base_url swap only, or model-id mapping plus parameter differences plus a new error taxonomy?"}
+  ],
+  "archetypes": [
+    {
+      "id": "unified-aggregator",
+      "label": "Unified aggregator (OpenRouter-style)",
+      "examples": ["OpenRouter", "aggregators that expose one API over many providers"],
+      "traits": {
+        "coverage": "broad catalogue across vendors",
+        "unit": "typically per token, with per-image models priced per image",
+        "compat": "OpenAI-shaped chat API, provider-specific passthroughs for some models",
+        "byok": "optional on some platforms",
+        "free": "usually a limited free tier or trial credits",
+        "limits": "platform limits plus provider limits",
+        "async": "mostly synchronous chat; image/video routes vary",
+        "retention": "set by the platform and the upstream provider",
+        "migration": "base_url swap plus model-id mapping"
+      },
+      "scores": {"coverage": 5, "unit_predictability": 3, "compat": 4, "migration_ease": 4, "async_support": 3}
+    },
+    {
+      "id": "per-unit-relay",
+      "label": "Per-unit relay route",
+      "examples": ["per-image, per-second and per-token relay endpoints"],
+      "traits": {
+        "coverage": "curated set of image, video and text models",
+        "unit": "flat per image / per second / per token",
+        "compat": "OpenAI-compatible paths with an async task model for generation",
+        "byok": "platform owns the provider relationship",
+        "free": "trial credits vary by account",
+        "limits": "documented per-route limits and a task TTL",
+        "async": "task id + poll URL, expiring result URLs",
+        "retention": "set by the relay operator",
+        "migration": "base_url swap plus model-id mapping plus poll-loop change"
+      },
+      "scores": {"coverage": 3, "unit_predictability": 5, "compat": 4, "migration_ease": 3, "async_support": 5}
+    },
+    {
+      "id": "self-hosted",
+      "label": "Self-hosted gateway",
+      "examples": ["LiteLLM proxy", "one-api / new-api", "APISIX or Kong AI plugins"],
+      "traits": {
+        "coverage": "whatever you configure",
+        "unit": "provider units plus your infrastructure cost",
+        "compat": "you normalise it",
+        "byok": "you hold every provider key",
+        "free": "not applicable",
+        "limits": "yours to configure",
+        "async": "you build the job layer",
+        "retention": "fully under your control",
+        "migration": "largest: deploy, configure and operate"
+      },
+      "scores": {"coverage": 4, "unit_predictability": 3, "compat": 3, "migration_ease": 1, "async_support": 2}
+    },
+    {
+      "id": "direct-vendor",
+      "label": "Direct vendor APIs",
+      "examples": ["first-party vendor endpoints"],
+      "traits": {
+        "coverage": "one vendor's models only",
+        "unit": "vendor-specific",
+        "compat": "vendor-specific",
+        "byok": "n/a",
+        "free": "vendor trial credits",
+        "limits": "vendor tiers",
+        "async": "varies per vendor",
+        "retention": "vendor policy",
+        "migration": "new integration per vendor"
+      },
+      "scores": {"coverage": 2, "unit_predictability": 2, "compat": 2, "migration_ease": 2, "async_support": 3}
+    }
+  ]
+}
